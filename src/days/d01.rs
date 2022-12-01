@@ -16,16 +16,14 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
         let mut o: Vec<Vec<u64>> = Vec::new();
 
         input.split("\n\n").for_each(|v| {
-            let v: Vec<u64> = v.lines()
+            let v: Vec<u64> = v
+                .lines()
                 .map(|v| v.parse::<u64>().expect("error while parsing input."))
                 .collect();
-                o.push(v);
+            o.push(v);
         });
 
-        (
-            Self {},
-            o
-        )
+        (Self {}, o)
     }
 
     fn one(&self, data: &mut Data) -> Answer {
@@ -36,6 +34,6 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
     fn two(&self, data: &mut Data) -> Answer {
         let mut d: Vec<u64> = data.iter().map(|v| v.iter().sum::<u64>()).collect();
         d.sort_by(|a, b| b.cmp(a));
-        Answer::Number(d[0]+d[1]+d[2] as u64)
+        Answer::Number(d[0] + d[1] + d[2] as u64)
     }
 }

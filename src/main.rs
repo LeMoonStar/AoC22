@@ -1,9 +1,9 @@
 use aoc22::{run_day, set_verbosity, test_day, Part, Verbosity};
 use clap::{App, AppSettings, Arg, SubCommand};
 use colored::*;
-use reqwest::header::USER_AGENT;
 use reqwest::blocking::Client;
 use reqwest::cookie::Jar;
+use reqwest::header::USER_AGENT;
 use std::env;
 use std::fs;
 use std::path::Path;
@@ -196,7 +196,10 @@ fn download_input(day: u8, session: &String) -> Result<String, reqwest::Error> {
 
     let response = client
         .get(format!("https://adventofcode.com/2021/day/{}/input", day))
-        .header(USER_AGENT, "https://github.com/LeMoonStar/AoC22 aoc22@unitcore.de")
+        .header(
+            USER_AGENT,
+            "https://github.com/LeMoonStar/AoC22 aoc22@unitcore.de",
+        )
         .send()?;
 
     if !response.status().is_success() {
