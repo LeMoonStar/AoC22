@@ -3,60 +3,99 @@ use crate::dprintln;
 
 const CURRENT_DAY: u8 = 2;
 
-fn get_hand_score(g: &String) -> u64 {
-    if g == "X" {
-        return 1;
-    }
-    if g == "Y" {
-        return 2;
-    }
-    if g == "Z" {
-        return 3;
-    }
-    return 0;
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum GameResult {
+    Win,
+    Draw,
+    Loose,
 }
 
-// A X: Rock     1
-// B Y: Paper    2
-// C Z: Scissors 3
-fn get_hand_score_p2(opponent: &String, own: &String) -> u64 {
-    if own == "X" {
-        if opponent == "A" {
-            return 3;
-        }
-        if opponent == "B" {
-            return 1;
-        }
-        if opponent == "C" {
-            return 2;
+impl GameResult {
+    fn score(&self) -> u64 {
+        match self {
+            GameResult::Win => 6,
+            GameResult::Draw => 3,
+            GameResult::Loose => 0,
         }
     }
-    if own == "Y" {
-        if opponent == "A" {
-            return 1;
-        }
-        if opponent == "B" {
-            return 2;
-        }
-        if opponent == "C" {
-            return 3;
-        }
-    }
-    if own == "Z" {
-        if opponent == "A" {
-            return 2;
-        }
-        if opponent == "B" {
-            return 3;
-        }
-        if opponent == "C" {
-            return 1;
-        }
-    }
-    return 0;
 }
 
-type Data = Vec<Vec<String>>;
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Hand {
+    StoneOrLoose = 1,
+    PaperOrDraw = 2,
+    ScissorsOrWin = 3,
+}
+
+impl Hand {
+    /// Get the score of a hand
+    fn score(&self) -> u64 {
+        *self as u64
+    }
+
+    fn result_score(&self) -> u64 {
+        match self {
+            Hand::StoneOrLoose => 0,
+            Hand::PaperOrDraw => 3,
+            Hand::ScissorsOrWin => 6,
+        }
+    }
+
+    /// Check the result of a game.
+    fn play(&self, other: &Self) -> GameResult {
+        match (self, other) {
+            (Hand::StoneOrLoose, Hand::ScissorsOrWin) => GameResult::Win,
+            (Hand::PaperOrDraw, Hand::StoneOrLoose) => GameResult::Win,
+            (Hand::ScissorsOrWin, Hand::PaperOrDraw) => GameResult::Win,
+
+            (Hand::StoneOrLoose, Hand::StoneOrLoose) => GameResult::Draw,
+            (Hand::PaperOrDraw, Hand::PaperOrDraw) => GameResult::Draw,
+            (Hand::ScissorsOrWin, Hand::ScissorsOrWin) => GameResult::Draw,
+
+            _ => GameResult::Loose,
+        }
+    }
+
+    // Get the hand that would win or loose against this hand
+    fn get_opponent(&self, opponent_win: bool) -> Hand {
+        match opponent_win {
+            true => match self {
+                Hand::StoneOrLoose => Hand::PaperOrDraw,
+                Hand::PaperOrDraw => Hand::ScissorsOrWin,
+                Hand::ScissorsOrWin => Hand::StoneOrLoose,
+            },
+            false => match self {
+                Hand::StoneOrLoose => Hand::ScissorsOrWin,
+                Hand::PaperOrDraw => Hand::StoneOrLoose,
+                Hand::ScissorsOrWin => Hand::PaperOrDraw,
+            },
+        }
+    }
+
+    fn get_part2_matching(&self, other: &Self) -> Hand {
+        match self {
+            Hand::PaperOrDraw => *other,
+            Hand::ScissorsOrWin => other.get_opponent(true),
+            Hand::StoneOrLoose => other.get_opponent(false),
+        }
+    }
+}
+
+impl From<&str> for Hand {
+    fn from<'a>(s: &str) -> Self {
+        match s {
+            "A" => Hand::StoneOrLoose,
+            "B" => Hand::PaperOrDraw,
+            "C" => Hand::ScissorsOrWin,
+            "X" => Hand::StoneOrLoose,
+            "Y" => Hand::PaperOrDraw,
+            "Z" => Hand::ScissorsOrWin,
+            _ => panic!("Invalid input while parsing"),
+        }
+    }
+}
+
+type Data = Vec<Vec<Hand>>;
 impl DayImpl<Data> for Day<CURRENT_DAY> {
     fn init_test() -> (Self, Data) {
         Self::init(&include_str!("test_inputs/test02.txt").to_owned())
@@ -71,47 +110,23 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
             Self {},
             input
                 .lines()
-                .map(|v| v.split_whitespace().map(|v| v.to_owned()).collect())
+                .map(|v| v.split_whitespace().map(|v| Hand::from(v)).collect())
                 .collect(),
         )
     }
 
-    // I know this is ugly and you could do it with some numbers and offsets. I'll do that later.
-    // Wanna finish it quickly rn and am sleepy.
     fn one(&self, data: &mut Data) -> Answer {
         let mut score = 0;
         for g in data {
-            score += get_hand_score(&g[1]);
-            dprintln!("{:?}", g);
-            if g[0] == "A" && g[1] == "X"
-                || g[0] == "B" && g[1] == "Y"
-                || g[0] == "C" && g[1] == "Z"
-            {
-                dprintln!("draw!");
-                score += 3;
-            } else if g[0] == "A" && g[1] == "Y"
-                || g[0] == "B" && g[1] == "Z"
-                || g[0] == "C" && g[1] == "X"
-            {
-                dprintln!("win!");
-                score += 6;
-            }
+            score += g[1].play(&g[0]).score() + g[1].score();
         }
         Answer::Number(score)
     }
 
-    // Same here again, there are way nicer solutions, and I'll fix this one up later.
     fn two(&self, data: &mut Data) -> Answer {
         let mut score = 0;
         for g in data {
-            score += get_hand_score_p2(&g[0], &g[1]);
-            if g[1] == "X" {
-                score += 0;
-            } else if g[1] == "Y" {
-                score += 3;
-            } else {
-                score += 6;
-            }
+            score += g[1].get_part2_matching(&g[0]).score() + g[1].result_score();
         }
         Answer::Number(score)
     }
