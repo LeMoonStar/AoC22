@@ -195,7 +195,7 @@ fn download_input(day: u8, session: &String) -> Result<String, reqwest::Error> {
         .build()?;
 
     let response = client
-        .get(format!("https://adventofcode.com/2021/day/{}/input", day))
+        .get(format!("https://adventofcode.com/2022/day/{}/input", day))
         .header(
             USER_AGENT,
             "https://github.com/LeMoonStar/AoC22 aoc22@unitcore.de",
