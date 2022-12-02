@@ -3,8 +3,8 @@
 [![About](https://img.shields.io/badge/Advent%20of%20Code-2022-brightgreen?style=flat-square)](https://adventofcode.com/2021/about)
 [![Language: Rust](https://img.shields.io/badge/Language-Rust-orange.svg?style=flat-square)](https://en.wikipedia.org/wiki/Rust_(programming_language))
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://mit-license.org/)
-![Days completed](https://img.shields.io/badge/Days%20completed-0-red?style=flat-square)
-![Stars](https://img.shields.io/badge/Stars-0-yellow?style=flat-square)
+![Days completed](https://img.shields.io/badge/Days%20completed-2-red?style=flat-square)
+![Stars](https://img.shields.io/badge/Stars-4-yellow?style=flat-square)
 
 The second year in a row that I use Rust. I truly fell in love with rust, however, I haven't been coding too much lately, so might be a bit rusty.  
 Anyhow, this repository contains my solutions for [Advent of Code 2022](https://adventofcode.com/2022/) written in Rust.
@@ -45,3 +45,4 @@ the `--release` option is not required, but it results in better performance.
 | [derNiklaas' Advent-of-Code-2022](https://github.com/derNiklaas/Advent-of-Code-2022)                 | Kotlin                                  |
 | [andi's aoc2022](https://git.schmarrn.dev/andi/aoc2022/) [External Site!]                            | Rust                                    |
 | [noeppi_noeppi's aoc (2022)](https://github.com/noeppi-noeppi/aoc/tree/master/2022)                  | Multiple Languages                      |
+| [Sammy's AdventOfCOde](https://github.com/1Turtle/AdventOfCode)                                      | Lua                                     |
