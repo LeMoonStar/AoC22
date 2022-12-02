@@ -5,7 +5,7 @@ const CURRENT_DAY: u8 = 1;
 type Data = Vec<Vec<u64>>;
 impl DayImpl<Data> for Day<CURRENT_DAY> {
     fn init_test() -> (Self, Data) {
-        Self::init(&include_str!("test_inputs/test01.txt").to_owned())
+        Self::init(include_str!("test_inputs/test01.txt"))
     }
 
     fn expected_results() -> (Answer, Answer) {
@@ -28,12 +28,12 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
 
     fn one(&self, data: &mut Data) -> Answer {
         let n: u64 = data.iter().map(|v| v.iter().sum()).max().unwrap();
-        Answer::Number(n as u64)
+        Answer::Number(n)
     }
 
     fn two(&self, data: &mut Data) -> Answer {
         let mut d: Vec<u64> = data.iter().map(|v| v.iter().sum::<u64>()).collect();
         d.sort_by(|a, b| b.cmp(a));
-        Answer::Number(d[0] + d[1] + d[2] as u64)
+        Answer::Number(d[0] + d[1] + d[2])
     }
 }

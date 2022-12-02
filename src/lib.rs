@@ -98,7 +98,7 @@ fn dynamic_range_time_format(d: &Duration) -> String {
     }
 }
 
-pub fn run_day(day: u8, part: Part, input: &String) {
+pub fn run_day(day: u8, part: Part, input: &str) {
     println!("{} Day {}", "Starting".green().bold(), day);
     println!("{}", "-----------------------".green().bold());
     let (one, two, init_t, one_t, two_t) = match part {

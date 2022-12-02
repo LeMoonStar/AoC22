@@ -1,5 +1,4 @@
 use super::{Answer, Day, DayImpl};
-use crate::dprintln;
 
 const CURRENT_DAY: u8 = 2;
 
@@ -56,7 +55,7 @@ impl Hand {
         }
     }
 
-    // Get the hand that would win or loose against this hand
+    /// Get the hand that would win or loose against this hand
     fn get_opponent(&self, opponent_win: bool) -> Hand {
         match opponent_win {
             true => match self {
@@ -98,7 +97,7 @@ impl From<&str> for Hand {
 type Data = Vec<Vec<Hand>>;
 impl DayImpl<Data> for Day<CURRENT_DAY> {
     fn init_test() -> (Self, Data) {
-        Self::init(&include_str!("test_inputs/test02.txt").to_owned())
+        Self::init(include_str!("test_inputs/test02.txt"))
     }
 
     fn expected_results() -> (Answer, Answer) {
@@ -110,7 +109,7 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
             Self {},
             input
                 .lines()
-                .map(|v| v.split_whitespace().map(|v| Hand::from(v)).collect())
+                .map(|v| v.split_whitespace().map(Hand::from).collect())
                 .collect(),
         )
     }

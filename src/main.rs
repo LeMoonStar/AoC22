@@ -206,7 +206,7 @@ fn download_input(day: u8, session: &String) -> Result<String, reqwest::Error> {
         panic!("Server error or invalid session.");
     }
 
-    Ok(response.text()?)
+    response.text()
 }
 
 fn get_auto_input(day: u8, session: &String, cache: bool) -> String {
