@@ -38,11 +38,7 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
         let mut sum = 0;
 
         for s in data {
-            for c in &s.0 {
-                if s.1.contains(c) {
-                    sum += get_character_priority(c);
-                }
-            }
+            sum += get_character_priority(s.0.intersection(&s.1).next().unwrap());
         }
         Answer::Number(sum)
     }
