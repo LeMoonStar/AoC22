@@ -17,7 +17,7 @@ impl Range {
 
 impl From<&str> for Range {
     fn from(v: &str) -> Self {
-        let mut s = v.split("-");
+        let mut s = v.split('-');
         Self(
             s.next().unwrap().parse().unwrap(),
             s.next().unwrap().parse().unwrap(),
@@ -40,7 +40,7 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
             Self {},
             input
                 .lines()
-                .map(|v| v.split(",").map(|v| Range::from(v)).collect())
+                .map(|v| v.split(',').map(Range::from).collect())
                 .collect(),
         )
     }
