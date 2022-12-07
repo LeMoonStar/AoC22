@@ -68,12 +68,10 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
 
         // --- PARSE STACKS ---
 
-        let mut stacks_input = s_input.next().unwrap().lines();
+        let stacks_input = s_input.next().unwrap().lines();
         let height = stacks_input.clone().count() - 1;
 
-        let mut i: usize = 0;
-
-        for mut l in stacks_input {
+        for (i, mut l) in stacks_input.enumerate() {
             if i == height {
                 break;
             }
@@ -95,13 +93,11 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
 
                 let c = p.chars().nth(1).unwrap();
                 if c != ' ' {
-                    let mut v = stacks.entry(n).or_insert(VecDeque::new());
+                    let v = stacks.entry(n).or_insert(VecDeque::new());
                     v.push_back(c);
                 }
                 n += 1;
             }
-
-            i += 1;
         }
 
         // --- PARSE INPUTS ---

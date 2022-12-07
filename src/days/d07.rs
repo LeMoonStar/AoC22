@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use super::{Answer, Day, DayImpl};
 use std::collections::BTreeMap;
 

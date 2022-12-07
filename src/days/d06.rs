@@ -4,12 +4,10 @@ use std::collections::VecDeque;
 const CURRENT_DAY: u8 = 6;
 
 fn contains_duplicate(queue: &VecDeque<char>) -> bool {
-    let mut i = 0;
     for v in queue {
         if queue.iter().filter(|x| x.eq(&v)).count() > 1 {
             return true;
         }
-        i += 1;
     }
 
     false
