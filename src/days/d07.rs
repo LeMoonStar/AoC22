@@ -104,6 +104,23 @@ impl File {
 
         sum
     }
+
+    fn task_two(&self, required_space: u64) -> Vec<u64> {
+        let mut v = Vec::new();
+
+        let s = self.get_size();
+        if s >= required_space {
+            v.push(s)
+        }
+
+        for c in self.children.values() {
+            if c.is_dir {
+                v.append(&mut c.task_two(required_space));
+            }
+        }
+
+        v
+    }
 }
 
 type Data = File;
@@ -113,7 +130,7 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
     }
 
     fn expected_results() -> (Answer, Answer) {
-        (Answer::Number(95437), Answer::Number(0))
+        (Answer::Number(95437), Answer::Number(24933642))
     }
 
     fn init(input: &str) -> (Self, Data) {
@@ -151,12 +168,16 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
     }
 
     fn one(&self, data: &mut Data) -> Answer {
-        data.print(0);
-
         Answer::Number(data.task_one())
     }
 
     fn two(&self, data: &mut Data) -> Answer {
-        Answer::Number(0)
+        let max_space = 40000000;
+        let space_to_clean = data.get_size() - max_space;
+
+        let mut res = data.task_two(space_to_clean);
+        res.sort();
+        
+        Answer::Number(*res.first().unwrap())
     }
 }
