@@ -38,12 +38,10 @@ impl File {
                 .map(|v| v.get_size_min_max(min, max))
                 .filter(|v| v >= &min && v <= &max)
                 .sum()
+        } else if self.size.unwrap() >= min && self.size.unwrap() <= max {
+            self.size.unwrap()
         } else {
-            if self.size.unwrap() >= min && self.size.unwrap() <= max {
-                self.size.unwrap()
-            } else {
-                0
-            }
+            0
         }
     }
 
@@ -73,26 +71,12 @@ impl File {
         self.children.get_mut(name).unwrap()
     }
 
-    fn print(&self, level: usize) {
-        println!(
-            "{} - DIR?{} - SIZE:{:?}",
-            " ".repeat(level),
-            self.is_dir,
-            self.size
-        );
-        for c in self.children.values() {
-            c.print(level + 1);
-        }
-    }
-
     // fuck this function
     fn task_one(&self) -> u64 {
         let mut sum = 0;
 
         let s = self.get_size();
-        println!("{}", s);
         if s <= 100000 {
-            println!("YEEEEEES!");
             sum += s;
         }
 
@@ -154,12 +138,9 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
                 }
             } else {
                 // This can only be ls output.
-                match a.parse::<u64>() {
-                    Ok(size) => {
-                        let f = File::new(false, Some(size));
-                        current_file.insert_child(l.next().unwrap(), f);
-                    }
-                    Err(_) => {}
+                if let Ok(size) = a.parse::<u64>() {
+                    let f = File::new(false, Some(size));
+                    current_file.insert_child(l.next().unwrap(), f);
                 }
             }
         }
@@ -177,7 +158,7 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
 
         let mut res = data.task_two(space_to_clean);
         res.sort();
-        
+
         Answer::Number(*res.first().unwrap())
     }
 }
