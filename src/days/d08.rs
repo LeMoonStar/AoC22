@@ -1,5 +1,4 @@
 use super::{Answer, Day, DayImpl};
-use crate::dprintln;
 
 const CURRENT_DAY: u8 = 8;
 
@@ -18,7 +17,6 @@ fn check_in_direction(field: &Data, mut x: usize, mut y: usize, direction: Direc
 
     loop {
         if x == 0 || y == 0 || x == width - 1 || y == height - 1 {
-            dprintln!("  {:?} Visible", direction);
             return true;
         }
         match direction {
@@ -35,16 +33,8 @@ fn check_in_direction(field: &Data, mut x: usize, mut y: usize, direction: Direc
                 x += 1;
             }
         }
-        dprintln!("    [{}|{}]", x, y);
 
-        dprintln!("    {} >= {} ?", field[y][x], own_height);
         if field[y][x] >= own_height {
-            dprintln!(
-                "  {:?} Not visible ({} >= {})",
-                direction,
-                field[y][x],
-                own_height
-            );
             return false;
         }
     }
@@ -135,16 +125,12 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
 
         for y in 0..height {
             for x in 0..width {
-                dprintln!("({})  {}|{}", data[y][x], x, y);
-
                 if y == 0
                     || x == 0
                     || y == height - 1
                     || x == width - 1
                     || check_if_visible(data, x, y)
                 {
-                    dprintln!("==VISIBLE==");
-                    // The tree is on the edge, it therefore is visible.
                     visible += 1;
                 }
             }
