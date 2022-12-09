@@ -51,9 +51,14 @@ struct Position {
 }
 
 impl Position {
-    fn touches_center(&self) -> bool {
-        ////println!("({} | {})", self.x.abs(), self.y.abs());
-        (self.x.abs() < 2) && (self.y.abs() < 2)
+    fn new() -> Self {
+        Position { x: 0, y: 0 }
+    }
+
+    fn is_touching(&self, other: &Self) -> bool {
+        let d = *self - *other;
+
+        (d.x.abs() < 2) && (d.y.abs() < 2)
     }
 
     fn get_direction(&self) -> Position {
@@ -93,6 +98,71 @@ impl AddAssign for Position {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+struct Knot {
+    pos: Position,
+}
+
+impl Knot {
+    fn new() -> Self {
+        Self {
+            pos: Position::new(),
+        }
+    }
+
+    fn follow(&mut self, other: &Self, visited: Option<&mut HashSet<Position>>) {
+        while !self.pos.is_touching(&other.pos) {
+            self.pos += (other.pos - self.pos).get_direction();
+        }
+        if let Some(s) = visited {
+            s.insert(self.pos);
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct Chain {
+    knots: Vec<Knot>,
+    visited: HashSet<Position>,
+}
+
+impl Chain {
+    fn new(len: usize) -> Self {
+        Self {
+            knots: vec![Knot::new(); len],
+            visited: HashSet::from([Position::new()]),
+        }
+    }
+
+    fn execute_move(&mut self, m: &Move) {
+        let goal = m.get_as_position() + self.knots[0].pos;
+        let step = m.get_direction();
+
+        while goal != self.knots[0].pos {
+            self.knots[0].pos += step;
+
+            let n = self.knots.len();
+            let mut prev = self.knots[0];
+            for i in 1..n {
+                self.knots[i].follow(
+                    &prev,
+                    // And this is where I messed up Part 2... I thought every knot of the tail was supposed to count towards the set... but noooo, just the last one, thank you.
+                    if i == n - 1 {
+                        Some(&mut self.visited)
+                    } else {
+                        None
+                    },
+                );
+                prev = self.knots[i];
+            }
+        }
+    }
+
+    fn get_visited_count(&self) -> usize {
+        self.visited.len()
+    }
+}
+
 const CURRENT_DAY: u8 = 9;
 
 type Data = Vec<Move>;
@@ -102,7 +172,7 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
     }
 
     fn expected_results() -> (Answer, Answer) {
-        (Answer::Number(13), Answer::Number(0))
+        (Answer::Number(88), Answer::Number(36))
     }
 
     fn init(input: &str) -> (Self, Data) {
@@ -110,36 +180,22 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
     }
 
     fn one(&self, data: &mut Data) -> Answer {
-        let mut head = Position { x: 0, y: 0 };
-        let mut tail = Position { x: 0, y: 0 };
-        let mut visited = HashSet::from([Position { x: 0, y: 0 }]);
+        let mut chain = Chain::new(2);
 
         for m in data {
-            //println!("{:?} from {:?}", m, head);
-            let goal = head + m.get_as_position();
-            let step = m.get_direction();
-
-            while head != goal {
-                head += step;
-                let distance = head - tail;
-                let direction = distance.get_direction();
-                //println!("  Distance:     {:?}", distance);
-                //println!("    HEAD:       {:?}", head);
-                //println!("    TAIL:       {:?}", tail);
-                if !distance.touches_center() {
-                    //println!("    --DON'T TOUCH");
-                    tail += direction;
-                    //println!("      MOVED TO: {:?}", tail);
-                    visited.insert(tail);
-                }
-            }
-            //println!();
+            chain.execute_move(m);
         }
 
-        Answer::Number(visited.len() as u64)
+        Answer::Number(chain.get_visited_count() as u64)
     }
 
     fn two(&self, data: &mut Data) -> Answer {
-        Answer::Number(0)
+        let mut chain = Chain::new(10);
+
+        for m in data {
+            chain.execute_move(m);
+        }
+
+        Answer::Number(chain.get_visited_count() as u64)
     }
 }
