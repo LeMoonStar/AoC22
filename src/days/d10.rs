@@ -129,18 +129,15 @@ impl Computer {
         strength
     }
 
-    fn draw_crt(&mut self) -> String {
-        let mut out = String::with_capacity(500);
+    fn draw_crt(&mut self) -> Vec<Vec<bool>> {
+        let mut out = vec![vec!(false; 40); 6];
         while self.state != State::End {
             let x = ((self.counter - 1) % 40) as i64;
-            if x == 0 {
-                out += "\n";
+            let y = (self.counter - 1) / 40;
+            if y == 6 {
+                break;
             }
-            if self.reg_x > x - 2 && self.reg_x < x + 2 {
-                out += "█";
-            } else {
-                out += " ";
-            }
+            out[y][x as usize] = self.reg_x > x - 2 && self.reg_x < x + 2;
             self.tick();
         }
         out
@@ -154,7 +151,47 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
     }
 
     fn expected_results() -> (Answer, Answer) {
-        (Answer::Number(13140), Answer::String("\n██  ██  ██  ██  ██  ██  ██  ██  ██  ██  \n███   ███   ███   ███   ███   ███   ███ \n████    ████    ████    ████    ████    \n█████     █████     █████     █████     \n██████      ██████      ██████      ████\n███████       ███████       ███████     \n ".to_owned()))
+        (
+            Answer::Number(13140),
+            Answer::Bitmap(vec![
+                vec![
+                    true, true, false, false, true, true, false, false, true, true, false, false,
+                    true, true, false, false, true, true, false, false, true, true, false, false,
+                    true, true, false, false, true, true, false, false, true, true, false, false,
+                    true, true, false, false,
+                ],
+                vec![
+                    true, true, true, false, false, false, true, true, true, false, false, false,
+                    true, true, true, false, false, false, true, true, true, false, false, false,
+                    true, true, true, false, false, false, true, true, true, false, false, false,
+                    true, true, true, false,
+                ],
+                vec![
+                    true, true, true, true, false, false, false, false, true, true, true, true,
+                    false, false, false, false, true, true, true, true, false, false, false, false,
+                    true, true, true, true, false, false, false, false, true, true, true, true,
+                    false, false, false, false,
+                ],
+                vec![
+                    true, true, true, true, true, false, false, false, false, false, true, true,
+                    true, true, true, false, false, false, false, false, true, true, true, true,
+                    true, false, false, false, false, false, true, true, true, true, true, false,
+                    false, false, false, false,
+                ],
+                vec![
+                    true, true, true, true, true, true, false, false, false, false, false, false,
+                    true, true, true, true, true, true, false, false, false, false, false, false,
+                    true, true, true, true, true, true, false, false, false, false, false, false,
+                    true, true, true, true,
+                ],
+                vec![
+                    true, true, true, true, true, true, true, false, false, false, false, false,
+                    false, false, true, true, true, true, true, true, true, false, false, false,
+                    false, false, false, false, true, true, true, true, true, true, true, false,
+                    false, false, false, false,
+                ],
+            ]),
+        )
     }
 
     fn init(input: &str) -> (Self, Data) {
@@ -169,6 +206,6 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
     }
 
     fn two(&self, data: &mut Data) -> Answer {
-        Answer::String(data.draw_crt())
+        Answer::Bitmap(data.draw_crt())
     }
 }

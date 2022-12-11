@@ -10,6 +10,70 @@ pub struct Day<const DAY: u8>;
 pub enum Answer {
     Number(u64),
     String(String),
+    Bitmap(Vec<Vec<bool>>),
+}
+
+impl Answer {
+    fn append_per_line(str: String, prefix: &str) -> String {
+        str.lines()
+            .map(|v| prefix.to_owned() + v + "\n")
+            .collect::<String>()
+            .strip_suffix('\n')
+            .unwrap()
+            .to_owned()
+    }
+
+    fn bm_get(bm: &[Vec<bool>], x: usize, y: usize) -> bool {
+        if let Some(line) = bm.get(y) {
+            if let Some(v) = line.get(x) {
+                return *v;
+            }
+            return false;
+        }
+        false
+    }
+
+    fn minify_bitmap(bm: &Vec<Vec<bool>>) -> String {
+        let height = bm.len();
+        let width = bm[0].len();
+
+        let mut out = String::new();
+
+        for y in (0..height).step_by(2) {
+            if y != 0 {
+                out += "\n"
+            }
+            for x in (0..width).step_by(2) {
+                let m = (
+                    Self::bm_get(bm, x, y),
+                    Self::bm_get(bm, x + 1, y),
+                    Self::bm_get(bm, x, y + 1),
+                    Self::bm_get(bm, x + 1, y + 1),
+                );
+
+                out += match m {
+                    (false, false, false, false) => " ",
+                    (true, false, false, false) => "▘",
+                    (false, true, false, false) => "▝",
+                    (true, true, false, false) => "▀",
+                    (false, false, true, false) => "▖",
+                    (true, false, true, false) => "▌",
+                    (false, true, true, false) => "▞",
+                    (true, true, true, false) => "▛",
+                    (false, false, false, true) => "▗",
+                    (true, false, false, true) => "▚",
+                    (false, true, false, true) => "▐",
+                    (true, true, false, true) => "▜",
+                    (false, false, true, true) => "▄",
+                    (true, false, true, true) => "▙",
+                    (false, true, true, true) => "▟",
+                    (true, true, true, true) => "█",
+                }
+            }
+        }
+
+        Self::append_per_line(out, "\t\t")
+    }
 }
 
 impl std::fmt::Display for Answer {
@@ -17,6 +81,10 @@ impl std::fmt::Display for Answer {
         match self {
             Self::Number(n) => write!(f, "{}", n),
             Self::String(s) => write!(f, "{}", s),
+            Self::Bitmap(bm) => {
+                writeln!(f).unwrap();
+                write!(f, "{}", Self::minify_bitmap(bm))
+            }
         }
     }
 }
