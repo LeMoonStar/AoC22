@@ -113,12 +113,12 @@ struct Monkey {
 impl Monkey {
     fn inspect_items(&mut self, relieve_enabled: bool) {
         for i in &mut self.items {
-            self.inspection_count += 1;
             i.worry_level = self.operation.execute(i.worry_level);
             if relieve_enabled {
                 i.worry_level /= 3;
             }
         }
+        self.inspection_count += self.items.len() as u64;
     }
 
     fn take_turn(&mut self, relieve_enabled: bool) -> Vec<Throw> {
