@@ -81,8 +81,8 @@ where
     where
         Self: Sized,
     {
-        let (day, data) = Self::init(input);
-        (day.one(&mut data.clone()), day.two(&mut data.clone()))
+        let (day, mut data) = Self::init(input);
+        (day.one(&mut data.clone()), day.two(&mut data))
     }
 
     /// Init and compute part 1
@@ -128,9 +128,9 @@ where
     where
         Self: Sized,
     {
-        let ((day, data), i_t) = Self::init_timed(input);
+        let ((day, mut data), i_t) = Self::init_timed(input);
         let (one, one_t) = day.one_timed(&mut data.clone());
-        let (two, two_t) = day.two_timed(&mut data.clone());
+        let (two, two_t) = day.two_timed(&mut data);
 
         (one, two, i_t, one_t, two_t)
     }
@@ -166,9 +166,9 @@ where
     where
         Self: Sized,
     {
-        let (day, data) = Self::init_test();
+        let (day, mut data) = Self::init_test();
         let one = day.one(&mut data.clone());
-        let two = day.two(&mut data.clone());
+        let two = day.two(&mut data);
 
         let (one_e, two_e) = Self::expected_results();
 
