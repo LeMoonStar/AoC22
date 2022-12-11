@@ -8,15 +8,6 @@ pub enum Command {
     AddX(i64),
 }
 
-impl Command {
-    fn get_cycle_count(&self) -> u8 {
-        match self {
-            Self::Noop => 1,
-            Self::AddX(_) => 2,
-        }
-    }
-}
-
 impl From<&str> for Command {
     fn from(value: &str) -> Self {
         let mut s = value.split_ascii_whitespace();
