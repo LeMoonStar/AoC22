@@ -70,7 +70,7 @@ impl Map {
         }
     }
 
-    fn get_neighbors(&self, pos: Position) -> Vec<Position> {
+    fn get_neighbors_up(&self, pos: Position) -> Vec<Position> {
         let mut accessible = Vec::new();
         let own_h = self.get_field(pos).unwrap();
 
@@ -83,6 +83,27 @@ impl Map {
             let n_pos = pos.move_in_direction(d);
             if let Some(h) = self.get_field(n_pos) {
                 if h <= own_h + 1 {
+                    accessible.push(n_pos);
+                }
+            }
+        }
+
+        accessible
+    }
+
+    fn get_neighbors_down(&self, pos: Position) -> Vec<Position> {
+        let mut accessible = Vec::new();
+        let own_h = self.get_field(pos).unwrap();
+
+        for d in [
+            Direction::Up,
+            Direction::Down,
+            Direction::Right,
+            Direction::Left,
+        ] {
+            let n_pos = pos.move_in_direction(d);
+            if let Some(h) = self.get_field(n_pos) {
+                if h >= own_h.saturating_sub(1) {
                     accessible.push(n_pos);
                 }
             }
@@ -108,7 +129,7 @@ impl Map {
                 return Some(self.reconstruct_path(&came_from, current));
             }
             open_set.remove(0);
-            for neighbor in self.get_neighbors(current) {
+            for neighbor in self.get_neighbors_up(current) {
                 let tentative_gscore = *g_score.get(&current).get_or_insert(&u64::MAX) + 1;
 
                 if tentative_gscore < **g_score.get(&neighbor).get_or_insert(&u64::MAX) {
@@ -123,6 +144,36 @@ impl Map {
                         open_set.push(neighbor);
                         open_set
                             .sort_by(|a, b| f_score.get(a).unwrap().cmp(f_score.get(b).unwrap()));
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    // Jerome was here :)
+    fn search_from_end(&self, start: Position, goal: u8) -> Option<Vec<Position>> {
+        let mut open_set = vec![start];
+        let mut came_from = BTreeMap::new();
+
+        let mut g_score = BTreeMap::new();
+        g_score.insert(start, 0);
+
+        while !open_set.is_empty() {
+            let current = *open_set.first().unwrap();
+            if self.get_field(current).unwrap() == goal {
+                return Some(self.reconstruct_path(&came_from, current));
+            }
+            open_set.remove(0);
+            for neighbor in self.get_neighbors_down(current) {
+                let tentative_gscore = *g_score.get(&current).get_or_insert(&u64::MAX) + 1;
+
+                if tentative_gscore < **g_score.get(&neighbor).get_or_insert(&u64::MAX) {
+                    came_from.insert(neighbor, current);
+                    g_score.insert(neighbor, tentative_gscore);
+
+                    if !open_set.contains(&neighbor) {
+                        open_set.push(neighbor);
                     }
                 }
             }
@@ -201,19 +252,6 @@ impl DayImpl<Data> for Day<CURRENT_DAY> {
     }
 
     fn two(&self, data: &mut Data) -> Answer {
-        let mut shortest = u64::MAX;
-        for (y, row) in data.heights.iter().enumerate() {
-            for (x, h) in row.iter().enumerate() {
-                if *h == 0 {
-                    if let Some(p) = data.find_path(Position(x as i32, y as i32)) {
-                        let l = (p.len() - 1) as u64;
-                        if l < shortest {
-                            shortest = l;
-                        }
-                    }
-                }
-            }
-        }
-        Answer::Number(shortest)
+        Answer::Number((data.search_from_end(data.goal, 0).unwrap().len() - 1) as u64)
     }
 }
