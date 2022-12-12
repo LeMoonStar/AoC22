@@ -3,8 +3,8 @@
 [![About](https://img.shields.io/badge/Advent%20of%20Code-2022-brightgreen?style=flat-square)](https://adventofcode.com/2021/about)
 [![Language: Rust](https://img.shields.io/badge/Language-Rust-orange.svg?style=flat-square)](https://en.wikipedia.org/wiki/Rust_(programming_language))
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](https://mit-license.org/)
-![Days completed](https://img.shields.io/badge/Days%20completed-9-red?style=flat-square)
-![Stars](https://img.shields.io/badge/Stars-18-yellow?style=flat-square)
+![Days completed](https://img.shields.io/badge/Days%20completed-12-red?style=flat-square)
+![Stars](https://img.shields.io/badge/Stars-24-yellow?style=flat-square)
 
 The second year in a row that I use Rust. I truly fell in love with rust, however, I haven't been coding too much lately, so might be a bit rusty.  
 Anyhow, this repository contains my solutions for [Advent of Code 2022](https://adventofcode.com/2022/) written in Rust.
