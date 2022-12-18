@@ -1,5 +1,5 @@
 use std::{
-    collections::BTreeSet,
+    collections::{BTreeMap, BTreeSet},
     hash::Hash,
     ops::{Add, Sub},
 };
@@ -126,8 +126,8 @@ impl Rock {
         }
     }
 
-    fn check_if_intersects(&self, rel_pos: Vec2D) -> bool {
-        // Simple first box intersection test
+    /*fn check_if_intersects(&self, rel_pos: Vec2D) -> bool {
+        // Simple first box intersection test // Done by other parts already.
         let dim = self.get_dimensions();
         if rel_pos.0 < 0 || rel_pos.1 < 0 || rel_pos.0 > dim.0 || rel_pos.1 > dim.1 {
             return false;
@@ -136,23 +136,46 @@ impl Rock {
         // More accurate exact intersection test
         let shape = self.get_shape();
         shape.contains(&rel_pos)
-    }
+    }*/
 
-    fn check_if_placable(&self, pos: Vec2D, stones: &BTreeSet<Vec2D>) -> bool {
-        for p in self.get_shape() {
-            let p = p + pos;
-            if stones.contains(&p) {
+    fn check_if_placable(&self, pos: Vec2D, placed: &BTreeMap<Vec2D, Rock>) -> bool {
+        for other in placed {
+            if self.check_if_intersects_with(pos, other.1, *other.0) {
                 return false;
             }
         }
         true
+    }
+
+    fn check_if_intersects_with(&self, pos: Vec2D, other: &Self, other_pos: Vec2D) -> bool {
+        let own_dim = self.get_dimensions();
+        let other_dim = other.get_dimensions();
+        let x_padding = (own_dim.0 + other_dim.0) as usize;
+        let y_padding = (own_dim.1 + other_dim.1) as usize;
+
+        if pos.0.abs_diff(other_pos.0) > x_padding || pos.1.abs_diff(other_pos.1) > y_padding {
+            return false;
+        }
+
+        let own_shape = self.get_shape();
+        let other_shape = other.get_shape();
+
+        let rel_pos = pos - other_pos;
+
+        for p in own_shape {
+            if other_shape.contains(&(p + rel_pos)) {
+                return true;
+            }
+        }
+
+        false
     }
 }
 
 #[derive(Debug, Clone)]
 struct Chamber {
     width: u8,
-    stone: BTreeSet<Vec2D>,
+    placed: BTreeMap<Vec2D, Rock>,
     stack_height: usize,
     rock_count: usize,
     moves_count: usize,
@@ -163,7 +186,7 @@ impl Chamber {
     fn new(width: u8, wind_loop: Vec<Direction>) -> Self {
         Self {
             width,
-            stone: BTreeSet::new(),
+            placed: BTreeMap::new(),
             stack_height: 0,
             rock_count: 0,
             moves_count: 0,
@@ -178,19 +201,19 @@ impl Chamber {
                 if pos.0 == 0 {
                     return false;
                 }
-                rock.check_if_placable(Vec2D(pos.0 - 1, pos.1), &self.stone)
+                rock.check_if_placable(Vec2D(pos.0 - 1, pos.1), &self.placed)
             }
             Direction::Right => {
                 if pos.0 + dim.0 >= self.width as isize {
                     return false;
                 }
-                rock.check_if_placable(Vec2D(pos.0 + 1, pos.1), &self.stone)
+                rock.check_if_placable(Vec2D(pos.0 + 1, pos.1), &self.placed)
             }
-            Direction::Down => rock.check_if_placable(Vec2D(pos.0, pos.1 - 1), &self.stone),
+            Direction::Down => rock.check_if_placable(Vec2D(pos.0, pos.1 - 1), &self.placed),
         }
     }
 
-    fn draw_all(&self, rock: Option<Rock>, pos: Option<Vec2D>) {
+    /*fn draw_all(&self, rock: Option<Rock>, pos: Option<Vec2D>) {
         let (y_start, y_end) = if let Some(pos) = pos {
             ((pos.1 as usize).saturating_sub(10), (pos.1 + 10) as usize)
         } else {
@@ -207,7 +230,7 @@ impl Chamber {
                         continue;
                     }
                 }
-                if self.stone.contains(&c_pos) {
+                if self.placed.contains(&c_pos) {
                     print!("#");
                 } else if x == self.width {
                     print!("|")
@@ -220,7 +243,7 @@ impl Chamber {
             println!();
         }
         println!();
-    }
+    }*/
 
     fn spawn_rock(&mut self) {
         let mut pos = Vec2D(2, (self.stack_height + 4) as isize);
@@ -249,9 +272,7 @@ impl Chamber {
                 if n_height > self.stack_height {
                     self.stack_height = n_height;
                 }
-                for p in rock.get_shape() {
-                    self.stone.insert(p + pos);
-                }
+                self.placed.insert(pos, rock);
                 break;
             }
 
